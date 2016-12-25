@@ -1,0 +1,529 @@
+/* Maximum flow */
+
+#include <bits/stdc++.h>
+using namespace std;
+#define MAXV 205
+int res [MAXV][MAXV] ;
+
+int s , t , mf , f ;
+int n , m , b , d ;
+vector < int> p;
+void out(){
+ cout << endl;
+ for(int i = 1 ;i <= t ;i++){
+  for(int j = 1 ; j <= t ; j++)
+  cout << res[i][j]<<" ";
+  cout << endl;
+ }
+}
+void augment ( int v ,int minedge){ if( p[v] == -1){ f=  minedge; return ;}
+      else{ augment(p[v] , min(minedge,res[p[v]][v]) );
+          res[p[v]][v] -= f;
+          res[v][p[v]] += f;
+       }
+}
+void maxflow(){
+ f =mf = 0 ;
+ while(1){
+  p.assign(t+1,-1);
+  bitset<MAXV> vis ; queue<int> q ; vis.set(s); q.push(s);
+  while(!q.empty()){ int u = q.front(); q.pop(); if( u == t)break;
+               for( int i = 1 ; i<= t ; i++)
+               if( !vis.test(i) && res[u][i] > 0){
+                q.push(i) ; vis.set(i);p[i]=u;
+               }
+  }
+  augment(t,1e9 );
+  //cout <<"->"<<f<<endl;
+  if( f== 0 || f == 1e9){ break ;}
+  mf += f;
+ }
+}
+int main(){
+  int i , j, k, l;
+  while( scanf("%d",&n) != EOF ){
+    s = 1 ;
+      memset ( res , 0 ,sizeof res);
+      for ( i = 1 ; i <= n ; i++){
+       scanf("%d",&j);
+       res[2*i][(2*i) + 1] = j ;
+      }
+      scanf("%d",&m);
+      while ( m--){
+       scanf("%d %d %d", &i , &j ,&k);
+       res[2*i + 1][2*j] = k;
+      }
+      scanf("%d %d",&b,&d);
+      while(b--){
+       scanf("%d",&i); res[1][2*i] = 1e6 ;
+      }
+      t = 1+2*n+1 ;
+      while(d--){
+       scanf("%d",&i); res[2*i+1][t] = 1e6 ;
+      }
+      //out();
+      maxflow();
+      //out();
+      printf("%d\n",mf);
+  }
+  return 0;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+/* Maximum Flow */
+    #include <stdio.h>  
+    #include <string.h>  
+    #define INFF 0x3f3f3f3f3f3f3f  
+    #define INF 0x3f3f3f3f  
+    #include <queue>  
+    using namespace std;  
+    const int N = 105, M = 50005;  
+      
+    long long value[M], cost[M];  
+    int n, m, A[M], B[M], D, K, E, first[N], next[M], u[M], v[M], pe[N], pv[N], a[N], f[M], w[M], s, t;  
+    queue<int>q;  
+      
+    void add(int a, int b, int value, long long time) {  
+        u[E] = a; v[E] = b; w[E] = value; cost[E] = time;  
+        next[E] = first[u[E]];  
+        first[u[E]] = E ++;  
+        u[E] = b; v[E] = a; w[E] = 0; cost[E] = -time;  
+        next[E] = first[u[E]];  
+        first[u[E]] = E ++;  
+    }  
+      
+    void init() {  
+        E = s = 0, t = n;  
+        memset(first, -1, sizeof(first));  
+        for (int i = 0; i < m; i ++)  
+        scanf("%d%d%lld", &A[i], &B[i], &value[i]);  
+        scanf("%d%d", &D, &K);  
+        for (int i = 0; i < m; i ++) {  
+        add(A[i], B[i], K, value[i]);  
+        add(B[i], A[i], K, value[i]);  
+        }  
+        add(s, 1, D, 0);  
+    }  
+      
+    void solve() {  
+        init();  
+        bool vis[N];  
+        long long d[N], C = 0;  
+        int F = 0;  
+        memset(f, 0, sizeof(f));  
+        while(1) {  
+        for (int i = 0; i <= n; i ++)  
+            d[i] = INFF;  
+        d[s] = 0;  
+        memset(vis, 0, sizeof(vis));  
+        q.push(s);  
+        while(!q.empty()) {  
+            int u = q.front(); q.pop();  
+            vis[u] = 0;  
+            for (int e = first[u]; e != -1; e = next[e]) {  
+            if (w[e] > f[e] && d[v[e]] > d[u] + cost[e]) {  
+                d[v[e]] = d[u] + cost[e];  
+                pv[v[e]] = u; pe[v[e]] = e;  
+                if (!vis[v[e]]) {  
+                vis[v[e]] = 1;  
+                q.push(v[e]);  
+                }  
+            }  
+            }  
+        }  
+        if (d[t] == INFF) break;  
+        int a = INF;  
+        for (int v = t; v != s; v = pv[v])  
+            a = min(a, w[pe[v]] - f[pe[v]]);  
+        for (int v = t; v != s; v = pv[v]) {  
+            f[pe[v]] += a;  
+            f[pe[v]^1] -= a;  
+        }  
+        C += d[t] * a;  
+        F += a;  
+        }  
+        if (F < D) printf("Impossible.\n");  
+        else printf("%lld\n", C);  
+    }  
+      
+    int main() {  
+        while (~scanf("%d%d", &n, &m)) {  
+        solve();  
+        }  
+        return 0;  
+    }  
+
+
+
+
+
+/*Maximum Flow */
+#include<algorithm>
+#include<climits>
+#include<cstdio>
+#include<cstring>
+#include<queue>
+#include<vector>
+
+using namespace std;
+
+int N, mf, f, s, t, c;
+int res[110][110];
+vector<int> p;
+
+void augment(int v, int min_edge) {
+    if(v == s) {
+        f = min_edge;
+        return;
+    } else if(p[v] != -1) {
+        augment(p[v], min(min_edge, res[p[v]][v]));
+        res[p[v]][v] -= f;
+        res[v][p[v]] += f;
+    }
+}
+
+int main() {
+    // set up res, s, t
+    for(int i = 1;; i++) {
+        scanf("%d", &N);
+        if(N == 0) break;
+        scanf("%d %d %d", &s, &t, &c);
+        s--; t--;
+        memset(res, 0, sizeof res);
+        int x, y, w;
+        for(int j = 0; j < c; j++) {
+            scanf("%d %d %d", &x, &y, &w);
+            x--; y--;
+            res[x][y] += w;
+            res[y][x] += w;
+        }
+        mf = 0;
+        for(;;) {
+            f = 0;
+            vector<int> dist(N, INT_MAX);
+            dist[s] = 0;
+            queue<int> q;
+            q.push(s);
+            p.assign(N, -1);
+            while(!q.empty()) {
+                int u = q.front();
+                q.pop();
+                if(u == t) break;
+                for(int v = 0; v < N; v++) {
+                    if(res[u][v] > 0 && dist[v] == INT_MAX) {
+                        dist[v] = dist[u] + 1;
+                        q.push(v);
+                        p[v] = u;
+                    }
+                }
+            }
+            augment(t, INT_MAX);
+            if(f == 0) break;
+            mf += f;
+        }
+        printf("Network %d\nThe bandwidth is %d.\n\n", i, mf);
+    }
+}
+
+
+
+
+
+
+
+
+
+/*Floyd warshall */
+#include<cstdio>
+#include<cmath>
+#include<queue>
+#define MAX(a,b) ((a)>(b)?(a):(b))
+#define N 201
+using namespace std;
+struct Coord
+{
+    int x, y;
+    float getDistance(Coord& a)
+    {
+        return sqrt((x - a.x)*(x - a.x) + (y - a.y)*(y - a.y));
+    }
+}stone[N];
+float SPFA(int n);
+int main()
+{
+    int n, i, Case = 1;
+    while (scanf("%d", &n) && n)
+    {
+        for (i = 0; i < n; i++)
+            scanf("%d%d", &stone[i].x, &stone[i].y);
+
+        printf("Scenario #%d\nFrog Distance = %.3f\n\n", Case++, SPFA(n));
+    }
+
+    return 0;
+}
+float SPFA(int n)
+{
+    int i;
+    float d[N] = { 0 };
+    bool inQ[101] = {};
+    queue<int> Q;
+    for (i = 1; i < n; i++)
+        d[i] = 100000;
+    Q.push(0);
+    while (!Q.empty())
+    {
+        int idx = Q.front();
+        Q.pop();
+        inQ[idx] = false;
+        for (i = 1; i < n; i++)
+        {
+            float max = MAX(d[idx], stone[idx].getDistance(stone[i]));
+            if (max < d[i])
+            {
+                d[i] = max;
+                if (!inQ[i])
+                {
+                    Q.push(i);
+                    inQ[i] = true;
+                }
+            }
+        }
+    }
+    return d[1];
+}
+
+
+
+
+
+/* Floyd Warshall */
+
+#include<bits/stdc++.h>
+#define INT_MAX 2147483647
+using namespace std;
+int d [100 + 5] [100 + 5];
+void reset (int c)
+{
+    for ( int i = 0; i <= c; i++ ) {
+        for ( int j = 0; j <= c; j++ )
+            d [i] [j] = INT_MAX;
+    }
+}
+
+int main ()
+{
+    int c, s, q;
+    int cases = 0;
+    bool blank = false;
+
+    while ( scanf ("%d %d %d", &c, &s, &q) ) {
+        if ( c == 0 && s == 0 && q == 0 ) break;
+
+        reset (c);
+        int c1, c2, deci;
+
+        for ( int i = 0; i < s; i++ ) {
+            scanf ("%d %d %d", &c1, &c2, &deci);
+            d [c1] [c2] = d [c2] [c1] = deci;
+        }
+
+        for ( int k = 1; k <= c; k++ ) {
+            for ( int i = 1; i <= c; i++ ) {
+                for ( int j = 1; j <= c; j++ )
+                    d [i] [j] = d [j] [i] = min (d [i] [j], max (d [i] [k], d [k] [j]));
+            }
+        }
+
+        if ( blank ) printf ("\n");
+        blank = true;
+
+        printf ("Case #%d\n", ++cases);
+
+        for ( int i = 0; i < q; i++ ) {
+            scanf ("%d %d", &c1, &c2);
+            if ( d [c1] [c2] == INT_MAX ) printf ("no path\n");
+            else printf ("%d\n", d [c1] [c2]);
+        }
+    }
+
+    return 0;
+}
+
+
+
+
+
+/* floyd warshall */
+
+
+#include <cstdio>
+
+int min(int a, int b) {
+  return a < b ? a : b;
+}
+
+int main() {
+  int N, R, C = 1;
+  while (scanf("%d%d", &N, &R) && N) {
+    int max[101][101] = {};
+    while (R--) {
+      int C1, C2, P;
+      scanf("%d%d%d", &C1, &C2, &P);
+      max[C1][C2] = max[C2][C1] = P;
+    }
+    for (int k = 1; k <= N; k++) {
+      for (int a = 1; a <= N; a++) {
+        for (int b = 1; b <= N; b++) {
+          if (max[a][k] && max[k][b] && max[a][b] < min(max[a][k], max[k][b])) {
+            max[a][b] = min(max[a][k], max[k][b]);
+          }
+        }
+      }
+    }
+    int S, D, T;
+    scanf("%d%d%d", &S, &D, &T);
+    max[S][D]--;
+    printf("Scenario #%d\nMinimum Number of Trips = %d\n\n", C++, T / max[S][D] + ((T % max[S][D]) > 0));
+  }
+  return 0;
+}
+
+
+
+
+
+
+
+
+/* bin packing */
+#include <cstdio>
+#include <climits>
+#include <cstring>
+using namespace std;
+
+int main() {
+	int B[3], G[3], C[3];
+
+	while (scanf("%d %d %d %d %d %d %d %d %d", &B[0], &G[0], &C[0], &B[1],
+			&G[1], &C[1], &B[2], &G[2], &C[2]) != EOF) {
+		int min = INT_MAX, temp;
+		char ans[4];
+		//BCG
+		temp = C[0] + G[0] + B[1] + G[1] + B[2] + C[2];
+		if (temp < min) {
+			min = temp;
+			strcpy(ans, "BCG");
+		}
+		//BGC
+		temp = C[0] + G[0] + B[1] + C[1] + B[2] + G[2];
+		if (temp < min) {
+			min = temp;
+			strcpy(ans, "BGC");
+		}
+		//CBG
+		temp = B[0] + G[0] + C[1] + G[1] + B[2] + C[2];
+		if (temp < min) {
+			min = temp;
+			strcpy(ans, "CBG");
+		}
+		//CGB
+		temp = B[0] + G[0] + B[1] + C[1] + G[2] + C[2];
+		if (temp < min) {
+			min = temp;
+			strcpy(ans, "CGB");
+		}
+		//GBC
+		temp = C[0] + B[0] + C[1] + G[1] + B[2] + G[2];
+		if (temp < min) {
+			min = temp;
+			strcpy(ans, "GBC");
+		}
+		//GCB
+		temp = C[0] + B[0] + B[1] + G[1] + G[2] + C[2];
+		if (temp < min) {
+			min = temp;
+			strcpy(ans, "GCB");
+		}
+
+		printf("%s %d\n",ans,min);
+	}
+
+	return 0;
+}
+
+
+
+
+
+
+
+/* optimal binary search */
+
+#include <iostream>
+#include <cstdio>
+#include <cstring>
+using namespace std;
+ 
+const int N = 251;
+const int INF = 10000000;
+ 
+int main()
+{   
+    int n;
+    int p[N];
+    int sum[N], w[N][N];
+    int dp[N][N];
+     
+     
+    while(cin >> n)
+    {
+        for(int i = 1; i <= n; i ++)
+        {
+            cin >> p[i];
+            dp[i][i] = 0;
+        }
+         
+        sum[0] = 0;
+        for(int i = 1; i <= n; i ++)
+            sum[i] = sum[i - 1] + p[i];
+        for(int i = 1; i <= n; i ++)
+            for(int j = i; j <= n; j ++)
+                w[i][j] = sum[j] - sum[i - 1];
+        for(int i = 1; i <= n; i ++)
+        {
+            dp[i][i - 1] = 0;
+            w[i][i - 1] = 0;
+        }
+        dp[n + 1][n] = 0;
+        w[n + 1][n] = 0;
+             
+        for(int d = 1; d <= n - 1; d ++)
+        {
+            for(int l = 1, r = l + d; r <= n; l ++, r ++)
+            {   
+                dp[l][r] = INF;
+                  
+                for(int k = l; k <= r; k ++)
+                {
+                    dp[l][r] = min(dp[l][r], dp[l][k - 1] + dp[k + 1][r] + w[l][k - 1] + w[k + 1][r]);
+                }
+            }
+        } 
+         
+        cout << dp[1][n] << endl;
+    }
+     
+     
+    return 0;
+}
